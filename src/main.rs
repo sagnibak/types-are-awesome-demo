@@ -1,12 +1,8 @@
 fn main() {
-    let mut arr = [1, 2, 3];
-    // let ptr1 = &arr;
-    // let ptr2 = &arr;
-    let ptr3 = &mut arr;
-
-    drop(arr);
-    std::mem::forget(arr);
-    // println!("{:?}", ptr3);
+    let mut arr = vec![1, 2, 3];
+    let ptr = &arr;
+    Vec::drain(&mut arr, ..);
+    println!("{:?}", ptr);
 
     /*
         Assembly output from printing
