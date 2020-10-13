@@ -46,5 +46,3 @@ where
 {
     type Output = Succ<<M as Add<N>>::Output>;
 }
-
-fn main() {}
