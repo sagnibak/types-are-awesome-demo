@@ -116,4 +116,13 @@ fn main() {
     println!("{:?}", hello_world.vals);
     println!("{:?}", zip(another_hello, b).vals);
     println!("{:?}", a.vals);
+
+    fn do_something(bruh: &i32, birb: &Vec<i32>) -> () {
+        println!("{}, {:?}", bruh, birb);
+    }
+
+    let arr = vec![1, 2, 3, 4];
+    for a in arr.iter() {
+        do_something(a, &arr);
+    }
 }
