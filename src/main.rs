@@ -23,70 +23,42 @@ impl<N: Number> Number for Succ<N> {
     }
 }
 
-trait Equal {}
-impl Equal for (Zero, Zero) {}
-impl<M, N> Equal for (Succ<M>, Succ<N>)
+trait Equal<N> {}
+impl Equal<Zero> for Zero {}
+impl<M, N> Equal<Succ<N>> for Succ<M>
 where
-    M: Number,
+    M: Number + Equal<N>,
     N: Number,
-    (M, N): Equal,
 {
 }
 
-trait IsGreaterThan {}
-impl<N> IsGreaterThan for (Succ<N>, Zero) where N: Number {}
-impl<M, N> IsGreaterThan for (Succ<M>, Succ<N>)
+trait IsGreaterThan<N: Number> {}
+impl<N> IsGreaterThan<Zero> for Succ<N> where N: Number {}
+impl<M, N> IsGreaterThan<Succ<N>> for Succ<M>
 where
-    M: Number,
+    M: Number + IsGreaterThan<N>,
     N: Number,
-    (M, N): IsGreaterThan,
 {
 }
 
-trait Add {
+trait Add<N: Number> {
     type Output: Number;
 }
 
-impl<N> Add for (Zero, Succ<N>)
+impl<N> Add<N> for Zero
 where
     N: Number,
 {
     type Output = N;
 }
 
-// impl<N> Add for (Succ<N>, Zero)
-// where
-//     N: Number,
-// {
-//     type Output = N;
-// }
-
-// impl<M, N> Add for (M, Succ<N>)
-// where
-//     M: Number,
-//     N: Number,
-//     (M, N): Add,
-// {
-//     type Output = Succ<<(M, N) as Add>::Output>;
-// }
-
-impl<M, N> Add for (Succ<M>, N)
+impl<M, N> Add<N> for Succ<M>
 where
-    M: Number,
+    M: Number + Add<N>,
     N: Number,
-    (M, N): Add,
 {
-    type Output = Succ<<(M, N) as Add>::Output>;
+    type Output = Succ<<M as Add<N>>::Output>;
 }
-
-// impl<M, N> Add for (Succ<M>, Succ<N>)
-// where
-//     M: Number,
-//     N: Number,
-//     (M, N): Add,
-// {
-//     type Output = Succ<Succ<<(M, N) as Add>::Output>>;
-// }
 
 #[derive(Debug, Clone)]
 struct List<T, N: Number> {
@@ -114,9 +86,8 @@ where
 
 fn zip<T, U, L, R>(left: List<T, L>, right: List<U, R>) -> List<(T, U), L>
 where
-    L: Number,
+    L: Number + Equal<R>,
     R: Number,
-    (L, R): Equal,
 {
     List {
         vals: left.vals.into_iter().zip(right.vals.into_iter()).collect(),
@@ -127,8 +98,7 @@ where
 fn main() {
     type One = Succ<Zero>;
     type Two = Succ<One>;
-    type Three = <(One, Two) as Add>::Output;
-    // type Three = <(Two, One) as Add>::Output;
+    type Three = <Two as Add<One>>::Output;
     println!("{}", Zero::to_int());
     println!("{}", <Succ<Zero>>::to_int());
     assert_eq!(Zero::to_int(), 0);
@@ -142,17 +112,8 @@ fn main() {
     let world = cons("w", cons("o", cons("r", cons("l", cons("d", nil())))));
     let another_hello = hello.clone();
     // let ab = zip(a, hello);  // does not compile!
-    // let hello_world = zip(hello, world);
-    // println!("{:?}", hello_world.vals);
-    // println!("{:?}", zip(another_hello, b).vals);
+    let hello_world = zip(hello, world);
+    println!("{:?}", hello_world.vals);
+    println!("{:?}", zip(another_hello, b).vals);
     println!("{:?}", a.vals);
-
-    fn do_something(bruh: &i32, birb: &Vec<i32>) -> () {
-        println!("{}, {:?}", bruh, birb);
-    }
-
-    let arr = vec![1, 2, 3, 4];
-    for a in arr.iter() {
-        do_something(a, &arr);
-    }
 }
