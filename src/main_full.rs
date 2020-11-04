@@ -1,5 +1,3 @@
-#![allow(unused_variables)]
-
 use std::collections::VecDeque;
 use std::marker::PhantomData;
 
@@ -98,10 +96,24 @@ where
 }
 
 fn main() {
+    type One = Succ<Zero>;
+    type Two = Succ<One>;
+    type Three = <Two as Add<One>>::Output;
+    println!("{}", Zero::to_int());
+    println!("{}", <Succ<Zero>>::to_int());
+    assert_eq!(Zero::to_int(), 0);
+    assert_eq!(One::to_int(), 1);
+    assert_eq!(Two::to_int(), 2);
+    assert_eq!(Three::to_int(), 3);
+
     let a = cons(1, cons(2, cons(3, nil())));
+    let b = cons(-2, cons(-1, a.clone()));
     let hello = cons("h", cons("e", cons("l", cons("l", cons("o", nil())))));
     let world = cons("w", cons("o", cons("r", cons("l", cons("d", nil())))));
-    // let a_hello = zip(a, hello); // does not compile!
+    let another_hello = hello.clone();
+    // let ab = zip(a, hello); // does not compile!
     let hello_world = zip(hello, world);
     println!("{:?}", hello_world.vals);
+    println!("{:?}", zip(another_hello, b).vals);
+    println!("{:?}", a.vals);
 }
